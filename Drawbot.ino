@@ -66,16 +66,16 @@ void loop () {
         drawbotBuilder.home();
         break;
       case 'a':
-        drawbotBuilder.moveX(-50);
+        drawbotBuilder.moveX(-150);
         break;
       case 's':
-        drawbotBuilder.moveY(-50);
+        drawbotBuilder.moveY(-150);
         break;
       case 'x':
-        drawbotBuilder.moveX(50);
+        drawbotBuilder.moveX(150);
         break;
       case 'y':
-        drawbotBuilder.moveY(50);
+        drawbotBuilder.moveY(150);
         break;
       case 'r':
         drawbotBuilder.reset();
@@ -87,10 +87,10 @@ void loop () {
         servoPencil.moveTo(130);
         break;
       case 'g':
-        drawbotBuilder.goTo(3000, 3200, 100);
+        drawbotBuilder.goTo(2700, 2400, 500);
         break;
       case 'f':
-        drawbotBuilder.goTo(100, 500, 100);
+        drawbotBuilder.goTo(2250, 500, 500);
         break;
       default: Serial.println("Unknown user input");
     }

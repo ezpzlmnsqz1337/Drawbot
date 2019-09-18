@@ -11,6 +11,7 @@
 MyStepper::MyStepper(int _stepsPerRevolution, int _stepPin, int _dirPin, int _resetPin)
     : stepsPerRevolution(_stepsPerRevolution), stepPin(_stepPin), dirPin(_dirPin), resetPin(_resetPin)
 {
+  this->direction = MotorDirection::HOME;
 }
 
 void MyStepper::init(){
@@ -55,21 +56,30 @@ void MyStepper::spin()
 
 void MyStepper::setDirection(MotorDirection direction)
 {
-    if (direction == true) {
-        digitalWrite(this->dirPin, HIGH);
-    } else {
-        digitalWrite(this->dirPin, LOW);
-    }
+  if (direction == MotorDirection::NOT_HOME) {
+    Serial.println("Set direction: NOT HOME");
+    digitalWrite(this->dirPin, HIGH);
+    this->direction = MotorDirection::NOT_HOME;
+  } else {
+    Serial.println("Set direction: HOME");
+    digitalWrite(this->dirPin, LOW);
+    this->direction = MotorDirection::HOME;
+  }
+}
+
+MotorDirection MyStepper::getDirection()
+{
+  return this->direction;
 }
 
 void MyStepper::pause()
 {
-    digitalWrite(this->resetPin, HIGH);
+  digitalWrite(this->resetPin, HIGH);
 }
 
 void MyStepper::resume()
 {
-    digitalWrite(this->resetPin, LOW);
+  digitalWrite(this->resetPin, LOW);
 }
 
 void MyStepper::moveTo(int value)

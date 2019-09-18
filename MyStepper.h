@@ -14,6 +14,7 @@ class MyStepper
     int dirPin;
     int resetPin;
     int stepsPerRevolution;
+    MotorDirection direction;
 
 public:
     MyStepper(int _stepsPerRevolution, int _stepPin, int _dirPin, int _resetPin);
@@ -29,6 +30,8 @@ public:
     void spin();
 
     void setDirection(MotorDirection direction);
+
+    MotorDirection getDirection();
 
     void pause();
 
