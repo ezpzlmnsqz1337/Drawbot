@@ -8,36 +8,36 @@
 
 class MyStepper
 {
-    private:
-    int pos;
-    int stepPin;
-    int dirPin;
-    int resetPin;
-    int stepsPerRevolution;
-    MotorDirection direction;
+private:
+  int pos;
+  int stepPin;
+  int dirPin;
+  int resetPin;
+  int stepsPerRevolution;
+  MotorDirection direction;
 
 public:
-    MyStepper(int _stepsPerRevolution, int _stepPin, int _dirPin, int _resetPin);
+  MyStepper(int _stepsPerRevolution, int _stepPin, int _dirPin, int _resetPin);
 
-    void init();
+  void init();
 
-    void step(int speed);
+  void step(int speed);
 
-    void move();
+  void move();
 
-    void moveSteps(int steps);
+  void moveSteps(int steps);
 
-    void spin();
+  void spin();
 
-    void setDirection(MotorDirection direction);
+  void setDirection(MotorDirection direction);
 
-    MotorDirection getDirection();
+  MotorDirection getDirection();
 
-    void pause();
+  void pause();
 
-    void resume();
+  void resume();
 
-    void moveTo(int value);
+  void moveTo(int value);
 };
 
 // This is the end of the header guard

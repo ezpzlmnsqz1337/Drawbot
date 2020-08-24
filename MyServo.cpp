@@ -1,12 +1,6 @@
 #include "MyServo.h"
-
-#if ARDUINO >= 100
 #include "Arduino.h"
-#else
-#include "WProgram.h"
-#include "pins_arduino.h"
-#include "WConstants.h"
-#endif
+
 MyServo::MyServo(int _servoPin, int _minimum, int _maximum, int _pos)
     : servoPin(_servoPin), minimum(_minimum), maximum(_maximum), pos(_pos)
 {
