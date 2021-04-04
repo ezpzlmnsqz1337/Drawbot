@@ -9,10 +9,10 @@
 class MyStepper
 {
 private:
-  int pos;
   int stepPin;
   int dirPin;
   int resetPin;
+  long position;
   int stepsPerRevolution;
   MotorDirection direction;
 
@@ -29,7 +29,7 @@ public:
 
   void spin();
 
-  void setDirection(MotorDirection direction);
+  void setDirection(MotorDirection pDirection);
 
   MotorDirection getDirection();
 

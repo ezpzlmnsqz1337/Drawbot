@@ -25,7 +25,8 @@
 
 #define SERVO_PENCIL_SIGNAL_PIN 18
 
-float xE = 210, yE = 237;
+const float xE = 210;
+const float yE = 237;
 
 const int stepsPerRevolution = 200 * 16; // change this to fit the number of steps per revolution
 // for your motor

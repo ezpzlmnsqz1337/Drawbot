@@ -1,7 +1,7 @@
 {
     "board": "arduino:avr:mega",
     "configuration": "cpu=atmega2560",
-    "port": "COM11",
+    "port": "COM4",
     "programmer": "USBasp",
     "sketch": "Drawbot.ino"
 }

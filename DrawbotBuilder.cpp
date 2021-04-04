@@ -1,6 +1,7 @@
 #include "DrawbotBuilder.h"
 #include "MotorDirection.h"
 #include "Arduino.h"
+#include "math.h"
 
 DrawbotBuilder::DrawbotBuilder(const MyStepper& _motorX, const MyStepper& _motorY, int _xEndstopPin, int _yEndstopPin,
                                const MyServo& _servoPen)
@@ -11,31 +12,31 @@ DrawbotBuilder::DrawbotBuilder(const MyStepper& _motorX, const MyStepper& _motor
 
 void DrawbotBuilder::init()
 {
-  this->motorX.init();
-  this->motorY.init();
+  motorX.init();
+  motorY.init();
 
-  this->servoPen.init();
-  this->penUp();
+  servoPen.init();
+  // penUp();
 
-  pinMode(this->xEndstopPin, INPUT);
-  pinMode(this->yEndstopPin, INPUT);
+  pinMode(xEndstopPin, INPUT);
+  pinMode(yEndstopPin, INPUT);
 }
 
 void DrawbotBuilder::reset()
 {
   Serial.println("RESET");
-  this->motorX.pause();
-  this->motorY.pause();
+  motorX.pause();
+  motorY.pause();
 }
 
 void DrawbotBuilder::penUp()
 {
-  this->servoPen.moveTo(180);
+  servoPen.moveTo(180);
 }
 
 void DrawbotBuilder::penDown()
 {
-  this->servoPen.moveTo(130);
+  servoPen.moveTo(130);
 }
 
 void DrawbotBuilder::goTo(int x, int y, int speed, bool extrude)
@@ -44,147 +45,173 @@ void DrawbotBuilder::goTo(int x, int y, int speed, bool extrude)
   sprintf(buffer, "GOTO: [%d, %d] - %d", x, y, speed);
   Serial.println(buffer);
 
+  // handle drawbot origin offset to print area coordiantes
+  x = x + OFFSET_X;
+  y = y + OFFSET_Y;
+
+  Serial.print("OffsetX: ");
+  Serial.println(x);
+  Serial.print("OffsetY: ");
+  Serial.println(y);
+
+  // handle extruder
   if (extrude)
   {
-    this->penDown();
+    penDown();
   }
   else
   {
-    this->penUp();
+    penUp();
   }
 
-  if (this->xPosition > x)
-  {
-    this->motorX.setDirection(MotorDirection::HOME);
-  }
-  else if (this->xPosition < x)
-  {
-    this->motorX.setDirection(MotorDirection::NOT_HOME);
-  }
-  if (this->yPosition > y)
-  {
-    this->motorY.setDirection(MotorDirection::HOME);
-  }
-  else if (this->yPosition < y)
-  {
-    this->motorY.setDirection(MotorDirection::NOT_HOME);
-  }
+  // solve theta 2
+  float top2 = pow(x, 2) + pow(y, 2) - pow(ARM_1_LENGTH, 2) - pow(ARM_2_LENGTH, 2);
+  float bottom2 = 2 * (float)ARM_1_LENGTH * (float)ARM_2_LENGTH;  
+  
+  Serial.print("OffsetX: ");
+  Serial.println(x);
 
-  int offsetX = CANVAS_WIDTH - x;  // x = 50; offestX = 50 +
-  int offsetY = CANVAS_HEIGHT - y; // y = 30; offsetY = 90
+  float angle2 = acos(top2 / bottom2);
+  angle2 = angle2 * (180 / M_PI); // convert to degrees
+  angle2 = 180 - angle2; // we are setting the opposite angle
 
-  float distance = sqrt(offsetX * offsetX + offsetY * offsetY);
-  // double angle1 = M_PI + atan(offsetX / offsetY) + acos(distance / (ARM_1_LENGTH + ARM_2_LENGTH));
-  // double angle2 = M_PI + atan(offsetX / offsetY) - acos(distance / (ARM_1_LENGTH + ARM_2_LENGTH));
-  float angle1 =
-      M_PI + atan(offsetX / offsetY) * 180 / M_PI + acos(distance / (2 * (ARM_1_LENGTH + ARM_2_LENGTH))) * 180 / M_PI;
-  float angle2 =
-      M_PI + atan(offsetX / offsetY) * 180 / M_PI - acos(distance / (2 * (ARM_1_LENGTH + ARM_2_LENGTH))) * 180 / M_PI;
+  // solve theta 1
+  float top1 = ARM_2_LENGTH * sin(angle2 * (M_PI / 180)); // sin works with radians
+  float bottom1 = pow(x, 2) + pow(y, 2);
+  bottom1 = sqrtf(bottom1);
 
+  float angle1 = asin(top1 / bottom1) + atan2(y, x);
+  angle1 = angle1 * (180 / M_PI);
+
+  // convert to motor steps
   int xSteps = angle1 / ANGLE_PER_STEP;
-  int ySteps = abs(angle2 / ANGLE_PER_STEP);
+  int ySteps = angle2 / ANGLE_PER_STEP;
 
-  Serial.print("distance: ");
-  Serial.println(distance);
+  // handle direction
+  if (xPosition > xSteps)
+  {
+    motorX.setDirection(MotorDirection::HOME);
+  }
+  else if (xPosition < xSteps)
+  {
+    motorX.setDirection(MotorDirection::NOT_HOME);
+  }
+  if (yPosition > ySteps)
+  {
+    motorY.setDirection(MotorDirection::HOME);
+  }
+  else if (yPosition < ySteps)
+  {
+    motorY.setDirection(MotorDirection::NOT_HOME);
+  }
 
+  Serial.print("Top1: ");
+  Serial.println(top1);
+  Serial.print("Bottom1: ");
+  Serial.println(bottom1);
   Serial.print("Angle1: ");
   Serial.println(angle1);
   Serial.print("xSteps: ");
   Serial.println(xSteps);
+  Serial.print("Top2: ");
+  Serial.println(top2);
+  Serial.print("Bottom2: ");
+  Serial.println(bottom2);
   Serial.print("Angle2: ");
   Serial.println(angle2);
   Serial.print("ySteps: ");
   Serial.println(ySteps);
 
-  while (xSteps != this->xPosition || ySteps != this->yPosition)
+  // move motors
+  while (xSteps != xPosition || ySteps != yPosition)
   {
 
-    if (this->xPosition > xSteps > 0)
+    if (xPosition > xSteps > 0)
     {
-      this->motorX.step(speed);
-      this->xPosition--;
+      motorX.step(speed);
+      xPosition--;
     }
-    else if (this->xPosition < xSteps)
+    else if (xPosition < xSteps)
     {
-      this->motorX.step(speed);
-      this->xPosition++;
+      motorX.step(speed);
+      xPosition++;
     }
-    if (this->yPosition > ySteps > 0)
+    if (yPosition > ySteps > 0)
     {
-      this->motorY.step(speed);
-      this->yPosition--;
+      motorY.step(speed);
+      yPosition--;
     }
-    else if (this->yPosition < ySteps)
+    else if (yPosition < ySteps)
     {
-      this->motorY.step(speed);
-      this->yPosition++;
+      motorY.step(speed);
+      yPosition++;
     }
-    if (this->xPosition == 0 || this->yPosition == 0)
+    if (xPosition == 0 || yPosition == 0)
     {
       Serial.println("BREAK");
-      Serial.print(this->xPosition);
-      Serial.println(this->yPosition);
+      Serial.print(xPosition);
+      Serial.println(yPosition);
       break;
     }
   }
   Serial.println("END");
-  Serial.print(this->xPosition);
+  Serial.print(xPosition);
   Serial.print(", ");
-  Serial.println(this->yPosition);
+  Serial.println(yPosition);
 }
 
 void DrawbotBuilder::home()
 {
   Serial.println("HOME");
-  this->motorX.setDirection(MotorDirection::HOME);
-  this->motorY.setDirection(MotorDirection::HOME);
-  this->penUp();
+  motorX.setDirection(MotorDirection::HOME);
+  motorY.setDirection(MotorDirection::HOME);
+  penUp();
 
-  while (digitalRead(this->yEndstopPin) == 0 || digitalRead(this->xEndstopPin) == 0)
+  while (digitalRead(yEndstopPin) == 0 || digitalRead(xEndstopPin) == 0)
   {
-    if (digitalRead(this->yEndstopPin) == 0)
+    if (digitalRead(yEndstopPin) == 0)
     {
-      this->motorY.step(500);
+      motorY.step(500);
     }
-    if (digitalRead(this->xEndstopPin) == 0)
+    if (digitalRead(xEndstopPin) == 0)
     {
-      this->motorX.step(500);
+      motorX.step(500);
     }
   }
-  this->xPosition = 0;
-  this->yPosition = 0;
+  xPosition = 0;
+  yPosition = 0;
 
-  this->motorX.setDirection(MotorDirection::NOT_HOME);
-  this->motorY.setDirection(MotorDirection::NOT_HOME);
+  motorX.setDirection(MotorDirection::NOT_HOME);
+  motorY.setDirection(MotorDirection::NOT_HOME);
 }
 
 void DrawbotBuilder::moveX(int steps)
 {
   char buffer[50];
-  sprintf(buffer, "MOVE X: [%d, %d]", this->xPosition + steps, this->yPosition);
+  sprintf(buffer, "MOVE X: [%d, %d]", xPosition + steps, yPosition);
   Serial.println(buffer);
 
   if (steps > 0)
   {
-    this->motorX.setDirection(MotorDirection::NOT_HOME);
+    motorX.setDirection(MotorDirection::NOT_HOME);
   }
   else
   {
-    this->motorX.setDirection(MotorDirection::HOME);
+    motorX.setDirection(MotorDirection::HOME);
   }
   for (int i = 0; i < abs(steps); i++)
   {
-    if (digitalRead(this->xEndstopPin) == 0 || this->motorX.getDirection() == MotorDirection::NOT_HOME)
+    if (digitalRead(xEndstopPin) == 0 || motorX.getDirection() == MotorDirection::NOT_HOME)
     {
-      this->motorX.step(100 + i);
+      motorX.step(100 + i);
 
-      if (this->motorX.getDirection() == MotorDirection::NOT_HOME)
+      if (motorX.getDirection() == MotorDirection::NOT_HOME)
       {
-        this->xPosition++;
+        xPosition++;
       }
       else
       {
-        this->xPosition--;
+        xPosition--;
       }
     }
   }
@@ -193,30 +220,30 @@ void DrawbotBuilder::moveX(int steps)
 void DrawbotBuilder::moveY(int steps)
 {
   char buffer[50];
-  sprintf(buffer, "MOVE Y: [%d, %d]", this->xPosition, this->yPosition + steps);
+  sprintf(buffer, "MOVE Y: [%d, %d]", xPosition, yPosition + steps);
   Serial.println(buffer);
 
   if (steps > 0)
   {
-    this->motorY.setDirection(MotorDirection::NOT_HOME);
+    motorY.setDirection(MotorDirection::NOT_HOME);
   }
   else
   {
-    this->motorY.setDirection(MotorDirection::HOME);
+    motorY.setDirection(MotorDirection::HOME);
   }
   for (int i = 0; i < abs(steps); i++)
   {
-    if (digitalRead(this->yEndstopPin) == 0 || this->motorY.getDirection() == MotorDirection::NOT_HOME)
+    if (digitalRead(yEndstopPin) == 0 || motorY.getDirection() == MotorDirection::NOT_HOME)
     {
-      this->motorY.step(100 + i);
+      motorY.step(100 + i);
 
-      if (this->motorY.getDirection() == MotorDirection::NOT_HOME)
+      if (motorY.getDirection() == MotorDirection::NOT_HOME)
       {
-        this->yPosition++;
+        yPosition++;
       }
       else
       {
-        this->yPosition--;
+        yPosition--;
       }
     }
   }

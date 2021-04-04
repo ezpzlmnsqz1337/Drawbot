@@ -7,10 +7,15 @@
 #include "MotorDirection.h"
 // This is the content of the .h file, which is where the declarations go
 
-const unsigned int CANVAS_WIDTH = 150;
-const unsigned int CANVAS_HEIGHT = 140;
+const unsigned int CANVAS_WIDTH = 200;
+const unsigned int CANVAS_HEIGHT = 200;
+
 const unsigned int ARM_1_LENGTH = 200;
-const unsigned int ARM_2_LENGTH = 245;
+const unsigned int ARM_2_LENGTH = 210;
+
+const unsigned int OFFSET_X = 10;
+const unsigned int OFFSET_Y = 200;
+
 const float ANGLE_PER_STEP = 0.1125;
 
 class DrawbotBuilder

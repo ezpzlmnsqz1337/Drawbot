@@ -3,26 +3,26 @@
 #include "Arduino.h"
 
 MyStepper::MyStepper(int _stepsPerRevolution, int _stepPin, int _dirPin, int _resetPin)
-    : stepsPerRevolution(_stepsPerRevolution), stepPin(_stepPin), dirPin(_dirPin), resetPin(_resetPin), pos(90)
+    : stepsPerRevolution(_stepsPerRevolution), stepPin(_stepPin), dirPin(_dirPin), resetPin(_resetPin), position(0)
 {
-  this->direction = MotorDirection::HOME;
+  direction = MotorDirection::HOME;
 }
 
 void MyStepper::init()
 {
-  pinMode(this->stepPin, OUTPUT);
-  pinMode(this->dirPin, OUTPUT);
-  pinMode(this->resetPin, OUTPUT);
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+  pinMode(resetPin, OUTPUT);
 
-  digitalWrite(this->dirPin, LOW);
-  digitalWrite(this->resetPin, LOW);
+  digitalWrite(dirPin, LOW);
+  digitalWrite(resetPin, LOW);
 }
 
 void MyStepper::step(int speed)
 {
-  digitalWrite(this->stepPin, HIGH);
+  digitalWrite(stepPin, HIGH);
   delayMicroseconds(speed);
-  digitalWrite(this->stepPin, LOW);
+  digitalWrite(stepPin, LOW);
   delayMicroseconds(speed);
 }
 
@@ -34,7 +34,7 @@ void MyStepper::moveSteps(int steps)
 {
   for (int i = 0; i < steps; i++)
   {
-    this->step(100);
+    step(100);
   }
 }
 
@@ -44,42 +44,42 @@ void MyStepper::spin()
   for (int i = 0; i < stepsPerRevolution; i++)
   {
     // These four lines result in 1 step:
-    digitalWrite(this->stepPin, HIGH);
+    digitalWrite(stepPin, HIGH);
     delayMicroseconds(500);
-    digitalWrite(this->stepPin, LOW);
+    digitalWrite(stepPin, LOW);
     delayMicroseconds(500);
   }
 }
 
-void MyStepper::setDirection(MotorDirection direction)
+void MyStepper::setDirection(MotorDirection pDirection)
 {
-  if (direction == MotorDirection::NOT_HOME)
+  if (pDirection == MotorDirection::NOT_HOME)
   {
     Serial.println("Set direction: NOT HOME");
-    digitalWrite(this->dirPin, HIGH);
-    this->direction = MotorDirection::NOT_HOME;
+    digitalWrite(dirPin, HIGH);
+    direction = MotorDirection::NOT_HOME;
   }
   else
   {
     Serial.println("Set direction: HOME");
-    digitalWrite(this->dirPin, LOW);
-    this->direction = MotorDirection::HOME;
+    digitalWrite(dirPin, LOW);
+    direction = MotorDirection::HOME;
   }
 }
 
 MotorDirection MyStepper::getDirection()
 {
-  return this->direction;
+  return direction;
 }
 
 void MyStepper::pause()
 {
-  digitalWrite(this->resetPin, HIGH);
+  digitalWrite(resetPin, HIGH);
 }
 
 void MyStepper::resume()
 {
-  digitalWrite(this->resetPin, LOW);
+  digitalWrite(resetPin, LOW);
 }
 
 void MyStepper::moveTo(int value)

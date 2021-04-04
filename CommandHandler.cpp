@@ -84,10 +84,9 @@ void CommandHandler::reset()
 
 void CommandHandler::handleOld()
 {
-  int userInput;
   if (Serial.available() > 0)
   {
-    userInput = Serial.read();
+    int userInput = Serial.read();
     Serial.println("Command: " + userInput);
 
     switch (userInput)
