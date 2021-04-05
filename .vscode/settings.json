@@ -1,4 +1,16 @@
 {
     "editor.formatOnSave": true,
-    "C_Cpp.clang_format_path": "C:/Program Files/LLVM/bin/clang-format"
+    "files.associations": {
+        "*.h": "cpp",
+        "*.tcc": "cpp",
+        "limits": "cpp",
+        "array": "cpp"
+    },
+    "c-cpp-flylint.clang.enable": false,
+    "c-cpp-flylint.cppcheck.configFile": ".clang_format",
+    "c-cpp-flylint.cppcheck.platform": "unix32",
+    "c-cpp-flylint.flexelint.enable": false,
+    "c-cpp-flylint.lizard.enable": false,
+    "c-cpp-flylint.flawfinder.enable": false,
+    "c-cpp-flylint.cppcheck.executable": "cppcheck"
 }
