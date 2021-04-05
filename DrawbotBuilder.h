@@ -2,19 +2,21 @@
 #ifndef DRAWBOT_BUILDER_H
 #define DRAWBOT_BUILDER_H
 
-#include "MyStepper.h"
-#include "MyServo.h"
 #include "MotorDirection.h"
+#include "MyServo.h"
+#include "MyStepper.h"
+#include "Structures.h"
+#include <stdint.h>
 // This is the content of the .h file, which is where the declarations go
 
-const unsigned int CANVAS_WIDTH = 200;
-const unsigned int CANVAS_HEIGHT = 200;
+const int32_t CANVAS_WIDTH = 200;
+const int32_t CANVAS_HEIGHT = 200;
 
-const unsigned int ARM_1_LENGTH = 200;
-const unsigned int ARM_2_LENGTH = 210;
+const int32_t ARM_1_LENGTH = 200;
+const int32_t ARM_2_LENGTH = 210;
 
-const unsigned int OFFSET_X = 10;
-const unsigned int OFFSET_Y = 200;
+const int32_t OFFSET_X = 10;
+const int32_t OFFSET_Y = 200;
 
 const float ANGLE_PER_STEP = 0.1125;
 
@@ -24,14 +26,17 @@ private:
   MyStepper motorX;
   MyStepper motorY;
   MyServo servoPen;
-  int xEndstopPin;
-  int yEndstopPin;
+  int32_t xEndstopPin;
+  int32_t yEndstopPin;
 
-  int xPosition;
-  int yPosition;
+  int32_t xPosition;
+  int32_t yPosition;
+  int32_t mAngle1;
+  int32_t mAngle2;
+  int32_t mSpeed;
 
 public:
-  DrawbotBuilder(const MyStepper& _motorX, const MyStepper& _motorY, int _xEndstopPin, int _yEndstopPin,
+  DrawbotBuilder(const MyStepper& _motorX, const MyStepper& _motorY, int32_t _xEndstopPin, int32_t _yEndstopPin,
                  const MyServo& _servoPen);
 
   void init();
@@ -42,13 +47,20 @@ public:
 
   void penDown();
 
-  void moveX(int steps);
+  void moveX(int32_t steps);
 
-  void moveY(int steps);
+  void moveY(int32_t steps);
 
   void reset();
 
-  void goTo(int x, int y, int speed, bool extrude);
+  void goTo(int32_t x, int32_t y);
+  void goTo(const Positions& p);
+
+  void setSpeed(int32_t speed);
+  int32_t getSpeed();
+
+  Positions getPositions();
+  Angles getAngles();
 };
 
 // This is the end of the header guard

@@ -1,8 +1,8 @@
 #include "MyStepper.h"
-#include "MotorDirection.h"
 #include "Arduino.h"
+#include "MotorDirection.h"
 
-MyStepper::MyStepper(int _stepsPerRevolution, int _stepPin, int _dirPin, int _resetPin)
+MyStepper::MyStepper(int32_t _stepsPerRevolution, int32_t _stepPin, int32_t _dirPin, int32_t _resetPin)
     : stepsPerRevolution(_stepsPerRevolution), stepPin(_stepPin), dirPin(_dirPin), resetPin(_resetPin), position(0)
 {
   direction = MotorDirection::HOME;
@@ -18,7 +18,7 @@ void MyStepper::init()
   digitalWrite(resetPin, LOW);
 }
 
-void MyStepper::step(int speed)
+void MyStepper::step(int32_t speed)
 {
   digitalWrite(stepPin, HIGH);
   delayMicroseconds(speed);
@@ -30,9 +30,9 @@ void MyStepper::move()
 {
 }
 
-void MyStepper::moveSteps(int steps)
+void MyStepper::moveSteps(int32_t steps)
 {
-  for (int i = 0; i < steps; i++)
+  for (int32_t i = 0; i < steps; i++)
   {
     step(100);
   }
@@ -41,7 +41,7 @@ void MyStepper::moveSteps(int steps)
 void MyStepper::spin()
 {
   // Spin the stepper motor 1 revolution slowly:
-  for (int i = 0; i < stepsPerRevolution; i++)
+  for (int32_t i = 0; i < stepsPerRevolution; i++)
   {
     // These four lines result in 1 step:
     digitalWrite(stepPin, HIGH);
@@ -55,13 +55,11 @@ void MyStepper::setDirection(MotorDirection pDirection)
 {
   if (pDirection == MotorDirection::NOT_HOME)
   {
-    Serial.println("Set direction: NOT HOME");
     digitalWrite(dirPin, HIGH);
     direction = MotorDirection::NOT_HOME;
   }
   else
   {
-    Serial.println("Set direction: HOME");
     digitalWrite(dirPin, LOW);
     direction = MotorDirection::HOME;
   }
@@ -82,6 +80,6 @@ void MyStepper::resume()
   digitalWrite(resetPin, LOW);
 }
 
-void MyStepper::moveTo(int value)
+void MyStepper::moveTo(int32_t value)
 {
 }

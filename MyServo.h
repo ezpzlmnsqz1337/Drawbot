@@ -9,22 +9,22 @@
 class MyServo
 {
 private:
-  int minimum;
-  int maximum;
-  int pos;
-  int servoPin;
+  int32_t minimum;
+  int32_t maximum;
+  int32_t pos;
+  int32_t servoPin;
   Servo servo;
 
 public:
-  MyServo(int _servoPin, int _minimum, int _maximum, int _pos);
+  MyServo(int32_t _servoPin, int32_t _minimum, int32_t _maximum, int32_t _pos);
 
   void init();
 
-  int getPosition();
+  int32_t getPosition();
 
-  void moveBy(int value);
+  void moveBy(int32_t value);
 
-  void moveTo(int value);
+  void moveTo(int32_t value);
 
   void sweep();
 };

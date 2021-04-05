@@ -3,29 +3,30 @@
 #define MY_STEPPER_H
 
 #include "MotorDirection.h"
+#include <stdint.h>
 
 // This is the content of the .h file, which is where the declarations go
 
 class MyStepper
 {
 private:
-  int stepPin;
-  int dirPin;
-  int resetPin;
+  int32_t stepPin;
+  int32_t dirPin;
+  int32_t resetPin;
   long position;
-  int stepsPerRevolution;
+  int32_t stepsPerRevolution;
   MotorDirection direction;
 
 public:
-  MyStepper(int _stepsPerRevolution, int _stepPin, int _dirPin, int _resetPin);
+  MyStepper(int32_t _stepsPerRevolution, int32_t _stepPin, int32_t _dirPin, int32_t _resetPin);
 
   void init();
 
-  void step(int speed);
+  void step(int32_t speed);
 
   void move();
 
-  void moveSteps(int steps);
+  void moveSteps(int32_t steps);
 
   void spin();
 
@@ -37,7 +38,7 @@ public:
 
   void resume();
 
-  void moveTo(int value);
+  void moveTo(int32_t value);
 };
 
 // This is the end of the header guard

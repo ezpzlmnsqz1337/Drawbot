@@ -3,17 +3,19 @@
 #define COMMAND_HANDLER_H
 
 #include "DrawbotBuilder.h"
+#include <stdint.h>
 
 // This is the content of the .h file, which is where the declarations go
 
-const int BUFFER_SIZE = 30;
+const int32_t BUFFER_SIZE = 50;
 
 class CommandHandler
 {
 private:
   DrawbotBuilder drawbotBuilder;
   char buffer[BUFFER_SIZE];
-  int sofar;
+  char original[BUFFER_SIZE];
+  int32_t sofar;
 
 public:
   explicit CommandHandler(const DrawbotBuilder& drawbotBuilder);

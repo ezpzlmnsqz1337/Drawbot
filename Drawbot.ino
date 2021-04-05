@@ -1,10 +1,11 @@
+#include <Arduino.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <Arduino.h>
 
-#include "MyStepper.h"
-#include "DrawbotBuilder.h"
 #include "CommandHandler.h"
+#include "DrawbotBuilder.h"
+#include "MyStepper.h"
 
 #define X_STEP_PIN 54
 #define X_DIR_PIN 55
@@ -28,7 +29,7 @@
 const float xE = 210;
 const float yE = 237;
 
-const int stepsPerRevolution = 200 * 16; // change this to fit the number of steps per revolution
+const int32_t stepsPerRevolution = 200 * 16; // change this to fit the number of steps per revolution
 // for your motor
 
 MyStepper myStepperX(stepsPerRevolution, X_STEP_PIN, X_DIR_PIN, X_ENABLE_PIN);
